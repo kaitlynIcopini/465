@@ -1,0 +1,24 @@
+;keyboard.s by Michael Oswald and Kaitlyn Icopini
+;//18
+;Lab1:
+
+; Include derivative-specific definitions
+INCLUDE 'derivative.inc'
+
+; export symbols
+XDEF _Startup, main
+XREF __SEG_END_SSTACK   ; symbol defined by the linker for the end of the stack
+
+
+main:
+_Startup:
+
+
+mainLoop:
+  ;Gets information from Master
+  ;Looks for the column has changed
+  ;Looks for the row has changed
+
+  ;Looks for the corresponding symbol for the button
+  ;Passes infromation onto LED S08
+  ;goes back to Master
