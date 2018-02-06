@@ -1,4 +1,4 @@
-;iic.s by Michael Oswald and Kaitlyn Icopini
+;iic.s by Michael Oswald and KaitlynIcopini
 ;//18
 ;Lab1:
 
@@ -15,5 +15,5 @@ _Startup:
 
 
 mainLoop:
-  ;Gets data
-  ;Send data
+  ;Clear IIFCIF
+  ;If Master mode

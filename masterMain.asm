@@ -26,8 +26,8 @@ _Startup:
   BSET SOPT2_IICPS, SOPT2
 
   ;Gives master an address for I2C
-  LDA #%_ _ _ _ _ _ _ 0
-  STA IICA
+  ;LDA #%_ _ _ _ _ _ _ 0
+  ;STA IICA
 
   ;Sets PTA pins 0-3 to be an input
   BCLR PTADD_PTADD0, PTADD
