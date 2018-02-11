@@ -99,27 +99,31 @@ mainLoop:
   BRA mainLoop
 
 Start:
-  ;Clears keyboard interrupt
-  BCLR KBISC_KBF, KBISC
+  ;Clears keyboard interrupt (acknowledges interrupt)
+  BSET KBISC_KBACK, KBISC
 
   ;Turns off keyboard interrupt
   BCLR KBISC_KBIE, KBISC
+
+  ;Turns off each row one by one to find the right row
+  ;If a row is turned off and the column that's on also turns off then it is the right row
+
 
   ;Restarts the timer module
   BCLR TPMSC_TOF, TPM
 
 keyboardTable:
-
+  ;uses ASCII characters 
 
 ;Once timer ends, everything is reset
 Restart:
   ;Turns on keyboard interrupt
   BSET KBISC_KBIE, KBISC
 
-  BCLR PTBD_PTBD2, PTBD
-  BCLR PTBD_PTBD3, PTBD
-  BCLR PTBD_PTBD4, PTBD
-  BCLR PTBD_PTBD5, PTBD
+  BSET PTBD_PTBD2, PTBD
+  BSET PTBD_PTBD3, PTBD
+  BSET PTBD_PTBD4, PTBD
+  BSET PTBD_PTBD5, PTBD
 
   ;Reset all pins
   ;Branch to mainLoop
