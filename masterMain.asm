@@ -9,6 +9,11 @@ INCLUDE 'derivative.inc'
 XDEF _Startup, main
 XREF __SEG_END_SSTACK   ; symbol defined by the linker for the end of the stack
 
+MY_ZEROPAGE: SECTION
+  charCode: DC.B 0
+
+;Code section
+MyCode: SECTION
 
 main:
 _Startup:
@@ -107,13 +112,19 @@ Start:
 
   ;Turns off each row one by one to find the right row
   ;If a row is turned off and the column that's on also turns off then it is the right row
+turnOffPTB2:
 
+turnOffPTB3:
+
+turnOffPTB4:
+
+turnOffPTB5:
 
   ;Restarts the timer module
   BCLR TPMSC_TOF, TPM
 
 keyboardTable:
-  ;uses ASCII characters 
+  ;uses ASCII characters
 
 ;Once timer ends, everything is reset
 Restart:
