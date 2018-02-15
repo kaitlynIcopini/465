@@ -19,8 +19,8 @@ MyCode: SECTION
 main:
 _Startup:
 
- 	;Turns off watchdog
- 	BCLR SOPT1_COPE, SOPT1
+ 		;Turns off watchdog
+ 		BCLR SOPT1_COPE, SOPT1
 
   	;Sets pin 2 to BKGD mode
   	BSET SOPT1_BKGDPE, SOPT1
@@ -36,7 +36,7 @@ _Startup:
   	;STA IICA
 
   	;Set PTB pins 2-5 to be an output
- 	MOV #%00111100, PTBDD
+ 		MOV #%00111100, PTBDD
 
   	;Turns on PTB pins 2-5
   	MOV #%00111100, PTBD
@@ -46,33 +46,22 @@ _Startup:
   	;Sets the keyboard interrupt to trigger on a rising edge on PTA pins 0-3 (pulldown)
   	MOV #%00001111, KBIES
 
-	;Enables internal resistors on PTA pins 0-3
-	MOV #%00001111, PTAPE
+		;Enables internal resistors on PTA pins 0-3
+		MOV #%00001111, PTAPE
 
- 	;Enables keyboard interrupt
+ 		;Enables keyboard interrupt
   	BSET KBISC_KBIE, KBISC
 
   	;Turns on keyboard interrupt on PTA pins 0-3
   	MOV #%00001111, KBIPE
 
-	;Sets PTA pins 0-3 to be an input
+		;Sets PTA pins 0-3 to be an input
   	MOV #%00000000, PTADD
 
   	;Turns off PTA pins 0-3
   	MOV #%00000000, PTAD
 
   	MOV #%00000000, column
-
-  	;Delay timer set up (TPM) for 20 ms
-  	;Enables Time Overflow interrupt, Clock source set to BUSCLK, Sets prescale value to 64
-;  	MOV #%01001110, TPMSC
-
-  	;TPMMOD is set to count for 20 ms
-  	;Sets the high end of the modulo
-;  	MOV #$09, TPMMODH
-
-  	;Sets the low end of the modulo
-;  	MOV #$C5, TPMMODL
 
 mainLoop:
   	;Look for interrupt
@@ -87,11 +76,39 @@ mainLoop:
   	BRA mainLoop
 
 Start:
-  	;JSR dDelay
+		;Delay timer set up (TPM) for 20 ms
+  	;Enables Time Overflow interrupt, Clock source set to BUSCLK, Sets prescale value to 64
+  	MOV #%01001110, TPMSC
+
+  	;TPMMOD is set to count for 20 ms
+  	;Sets the high end of the modulo
+  	MOV #$03, TPMMODH
+
+  	;Sets the low end of the modulo
+  	MOV #$AC, TPMMODL
+
   	;Clears keyboard interrupt (acknowledges interrupt)
+		BSET KBISC_KBACK, KBISC
+		;BCLR KBISC_KBIE, KBISC
+		;MOV PTAD, column
+
+delay:
+		;wait for about 15 ms, check the interupt again, then send
+		LDA #%11001110
+		CBEQA TMPSC, findButton
+		BRA delay
+
+findButton:
+	;Checks to see if interupt is still on, goes to mainLoop if not
+	LDA #%00000010
+	CBEQA KBISC, mainLoop
+
+	;Copies PTAD to column in order to find the right button
+	MOV PTAD, column
+
+	;Clears inturpt
 	BSET KBISC_KBACK, KBISC
 	BCLR KBISC_KBIE, KBISC
-	MOV PTAD, column
 
 ;Turns off each row one by one to find the right row
 ;If a row is turned off and the column that's on also turns off then it is the right row
@@ -100,7 +117,7 @@ turnOffPTBD2:
 	LDA PTAD
 	CMP column
 	BNE turnOffPTBD3
-	findInRow1:
+findInRow1:
 		LDA column
 		CBEQA #%00000001, R1C1
 		CBEQA #%00000010, R1C2
@@ -111,7 +128,7 @@ turnOffPTBD3:
 	LDA PTAD
 	CMP column
 	BNE turnOffPTBD4
-	findInRow2:
+findInRow2:
 		LDA column
 		CBEQA #%00000001, R2C1
 		CBEQA #%00000010, R2C2
@@ -122,7 +139,7 @@ turnOffPTBD4:
 	LDA PTAD
 	CMP column
 	BNE turnOffPTBD5
-	findInRow3:
+findInRow3:
 		LDA column
 		CBEQA #%00000001, R3C1
 		CBEQA #%00000010, R3C2
@@ -133,7 +150,7 @@ turnOffPTBD5:
 	LDA PTAD
 	CMP column
 	BNE error
-	findInRow4:
+findInRow4:
 		CBEQA #%00000001, R4C1
 		CBEQA #%00000010, R4C2
 		CBEQA #%00000100, R4C3
@@ -145,15 +162,14 @@ Restart:
 	BSET KBISC_KBIE, KBISC
 
 	;Turns rows back on
-	LDA #%00111100
-	STA PTBD
+	MOV #%00111100, PTBD
 
 	LDA #$00
 	STA charCode
 	STA column
 	BRA mainLoop
 
-;keyboardTable uses ASCII characters
+;Keyboard Table uses ASCII characters
 ;1
 R1C1:
 	MOV #$31, charCode
@@ -222,5 +238,3 @@ R4C4:
 error:
 	MOV #$21, charCode
 	BRA Restart
-
-;dDelay:
