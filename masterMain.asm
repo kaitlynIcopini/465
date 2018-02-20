@@ -18,9 +18,8 @@ MyCode: SECTION
 
 main:
 _Startup:
-
- 		;Turns off watchdog
- 		BCLR SOPT1_COPE, SOPT1
+ 	;Turns off watchdog
+ 	BCLR SOPT1_COPE, SOPT1
 
   	;Sets pin 2 to BKGD mode
   	BSET SOPT1_BKGDPE, SOPT1
@@ -36,20 +35,19 @@ _Startup:
   	;STA IICA
 
   	;Set PTB pins 2-5 to be an output
- 		MOV #%00111100, PTBDD
+ 	MOV #%00111100, PTBDD
 
   	;Turns on PTB pins 2-5
   	MOV #%00111100, PTBD
-
 
   	;initialize pull down resistors
   	;Sets the keyboard interrupt to trigger on a rising edge on PTA pins 0-3 (pulldown)
   	MOV #%00001111, KBIES
 
-		;Enables internal resistors on PTA pins 0-3
-		MOV #%00001111, PTAPE
+	;Enables internal resistors on PTA pins 0-3
+	MOV #%00001111, PTAPE
 
- 		;Enables keyboard interrupt
+ 	;Enables keyboard interrupt
   	BSET KBISC_KBIE, KBISC
 
   	;Turns on keyboard interrupt on PTA pins 0-3
@@ -76,7 +74,7 @@ mainLoop:
   	BRA mainLoop
 
 Start:
-		;Delay timer set up (TPM) for 20 ms
+	;Delay timer set up (TPM) for 20 ms
   	;Enables Time Overflow interrupt, Clock source set to BUSCLK, Sets prescale value to 64
   	MOV #%01001110, TPMSC
 
@@ -88,15 +86,15 @@ Start:
   	MOV #$AC, TPMMODL
 
   	;Clears keyboard interrupt (acknowledges interrupt)
-		BSET KBISC_KBACK, KBISC
-		;BCLR KBISC_KBIE, KBISC
-		;MOV PTAD, column
+	BSET KBISC_KBACK, KBISC
+	;BCLR KBISC_KBIE, KBISC
+	;MOV PTAD, column
 
 delay:
-		;wait for about 15 ms, check the interupt again, then send
-		LDA #%11001110
-		CBEQA TMPSC, findButton
-		BRA delay
+	;wait for about 15 ms, check the interupt again, then send
+	LDA #%11001110
+	CBEQA TMPSC, findButton
+	BRA delay
 
 findButton:
 	;Checks to see if interupt is still on, goes to mainLoop if not
@@ -118,43 +116,43 @@ turnOffPTBD2:
 	CMP column
 	BNE turnOffPTBD3
 findInRow1:
-		LDA column
-		CBEQA #%00000001, R1C1
-		CBEQA #%00000010, R1C2
-		CBEQA #%00000100, R1C3
-		CBEQA #%00001000, R1C4
+	LDA column
+	CBEQA #%00000001, R1C1
+	CBEQA #%00000010, R1C2
+	CBEQA #%00000100, R1C3
+	CBEQA #%00001000, R1C4
 turnOffPTBD3:
 	BCLR PTBD_PTBD3, PTBD
 	LDA PTAD
 	CMP column
 	BNE turnOffPTBD4
 findInRow2:
-		LDA column
-		CBEQA #%00000001, R2C1
-		CBEQA #%00000010, R2C2
-		CBEQA #%00000100, R2C3
-		CBEQA #%00001000, R2C4
+	LDA column
+	CBEQA #%00000001, R2C1
+	CBEQA #%00000010, R2C2
+	CBEQA #%00000100, R2C3
+	CBEQA #%00001000, R2C4
 turnOffPTBD4:
 	BCLR PTBD_PTBD4, PTBD
 	LDA PTAD
 	CMP column
 	BNE turnOffPTBD5
 findInRow3:
-		LDA column
-		CBEQA #%00000001, R3C1
-		CBEQA #%00000010, R3C2
-		CBEQA #%00000100, R3C3
-		CBEQA #%00001000, R3C4
+	LDA column
+	CBEQA #%00000001, R3C1
+	CBEQA #%00000010, R3C2
+	CBEQA #%00000100, R3C3
+	CBEQA #%00001000, R3C4
 turnOffPTBD5:
 	BCLR PTBD_PTBD5, PTBD
 	LDA PTAD
 	CMP column
 	BNE error
 findInRow4:
-		CBEQA #%00000001, R4C1
-		CBEQA #%00000010, R4C2
-		CBEQA #%00000100, R4C3
-		CBEQA #%00001000, R4C4
+	CBEQA #%00000001, R4C1
+	CBEQA #%00000010, R4C2
+	CBEQA #%00000100, R4C3
+	CBEQA #%00001000, R4C4
 
 ;Once timer ends, everything is reset
 Restart:
