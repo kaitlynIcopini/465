@@ -10,7 +10,7 @@
 		XREF __SEG_END_SSTACK   ; symbol defined by the linker for the end of the stac
 
 MY_ZEROPAGE: SECTION
-	toTransmit: DS.B 1
+	info: DS.B 1
 
 ;Code section
 MyCode: SECTION
@@ -35,14 +35,26 @@ master:
 ;Master mode to read data
 read:
 	;Last byte to be read?
+	;yes, generate stop, endRead
+	;no, 2nd to last byte to be read?
+	;yes, set TXACK = 1, endRead
+	;no, endRead
+	BRA endRead
+
+
+endRead:
+	;read data from IICD and store it
+	MOV IICD, info
+	RTI
+
 ;Master mode to transmit data
 transmit:
 	;Check to see if last byte has been transmitted
 	LDA #%00000000
-	CBEQA IICD, stopSignal
+	CBEQA IICD, endTransmit
 
 	;Received acknowledge
-	BRSET IICS_RXAK, IICS, stopSignal
+	BRSET IICS_RXAK, IICS, endTransmit
 
 	;End of address cylce?
 	;go to switchMode
@@ -53,6 +65,6 @@ switchMode:
 
 	;dummy read from IICD
 
-stopSignal:
+endTransmit:
 	BCLR IICC_MST, IICC
 	RTI
